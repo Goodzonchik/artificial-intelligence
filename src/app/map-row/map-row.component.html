@@ -1,0 +1,8 @@
+<div
+  *ngFor="let item of row; trackBy: identify"
+  class="item"
+  [ngClass]="item.styleClass"
+  [class.is-open]="item.isOpen"
+>
+  {{ item.isOpen ? item.type : '' }}
+</div>
