@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Rover } from './rover';
 import { SoursesService } from './sourses.service';
-import { initMap, mapSize } from './map/map.component';
 
 @Injectable({
   providedIn: 'root',
@@ -48,7 +47,7 @@ export class RoversService {
       }
       if (rover.action === 'mining') {
         rover.payload = rover.payload + 1;
-        this.soursesService.sourses$.getValue().knownSourses[0].payload--;
+        //this.soursesService.sourses$.getValue().sourses[0].payload--;
 
         // if (this.soursesService.sourses$.getValue().sourses[0].payload <= 0) {
         //   this.soursesService.removeSilver(
@@ -61,12 +60,19 @@ export class RoversService {
       if (rover.action === 'upload') {
         rover.payload = rover.payload - 1;
         this.soursesService.addSilver();
+
+        if (rover.payload === 1) {
+          rover.action = 'move';
+          rover.endPosition =
+            this.soursesService.sourses$.getValue().sourses[0].position;
+        }
       }
       /*if (rover.action === 'search') {
         rover.action = 'move';
         rover.endPosition.x === mapSize.x;
         rover.endPosition.x === mapSize.y;
       }*/
+      console.log(rover.action);
     }
   }
 

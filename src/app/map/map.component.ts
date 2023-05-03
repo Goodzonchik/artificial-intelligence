@@ -84,20 +84,10 @@ export class MapComponent implements OnInit {
 
     for (let j = 0; j < size; j++) {
       let biom = biomenters[0];
-      let biomLength = vectorSize(
-        biomenters[0].position.x,
-        biomenters[0].position.y,
-        x,
-        j
-      );
+      let biomLength = vectorSize(biomenters[0].position, { x, y: j });
 
       for (let i = 1; i < biomenters.length; i++) {
-        const vector = vectorSize(
-          biomenters[i].position.x,
-          biomenters[i].position.y,
-          x,
-          j
-        );
+        const vector = vectorSize(biomenters[i].position, { x, y: j });
 
         if (vector < biomLength) {
           biom = biomenters[i];

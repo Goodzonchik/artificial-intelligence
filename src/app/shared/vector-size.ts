@@ -1,13 +1,9 @@
-export const vectorSize = (
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-): number => {
-  const res = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+import { Position } from '../rover';
 
-  if (isNaN(res)) {
-    console.log('isNan', x1, y1, x2, y2);
-  }
+export const vectorSize = (point1: Position, point2: Position): number => {
+  const res = Math.sqrt(
+    Math.pow(point2.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2)
+  );
+
   return res;
 };
