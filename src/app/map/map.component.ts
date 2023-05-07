@@ -62,7 +62,7 @@ export class MapComponent implements OnInit {
 
   ngOnInit() {
     setInterval(() => {
-      this.roversService.updateRovers();
+      this.roversService.roverAction();
       this.roversService.miningAlgo();
       this.openWorld();
       this.drawRower();
@@ -71,12 +71,15 @@ export class MapComponent implements OnInit {
 
   generateMap() {
     const biomenters = this.generateBiomSeed();
-    console.log('biomenters', biomenters);
     for (let i = 0; i < mapSize.x; i++) {
       initMap[i] = this.generateMapRow(mapSize.y, i, biomenters);
     }
 
-    initMap[0][0] = actors[1];
+    this.setBase();
+  }
+
+  setBase(): void {
+    initMap[this.roversService.base.x][this.roversService.base.y] = actors[1];
   }
 
   generateMapRow(size: number, x: number, biomenters: any[]): MapItem[] {
@@ -119,19 +122,21 @@ export class MapComponent implements OnInit {
       return currentCord - size >= 0 ? currentCord - size : 0;
     }
 
-    function maxCoord(currentCord: number, size: number, isX: boolean) {
-      return currentCord + size >= 0
+    function maxCoord(
+      currentCord: number,
+      size: number,
+      mapSizeLength: number
+    ) {
+      return currentCord + size <= mapSizeLength
         ? currentCord + size
-        : isX
-        ? mapSize.x
-        : mapSize.y;
+        : mapSizeLength;
     }
 
     for (const rover of this.rovers) {
       const minX = minCoord(rover.position.x, viewSize);
       const minY = minCoord(rover.position.y, viewSize);
-      const maxX = maxCoord(rover.position.x, viewSize, true);
-      const maxY = maxCoord(rover.position.y, viewSize, false);
+      const maxX = maxCoord(rover.position.x, viewSize, mapSize.x);
+      const maxY = maxCoord(rover.position.y, viewSize, mapSize.y);
 
       for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
@@ -140,9 +145,10 @@ export class MapComponent implements OnInit {
             isOpen: true,
           };
 
-          if (initMap[x][y].type === '█') {
-            this.soursesService.addSourses({ x, y }, true);
-          }
+          // TODO
+          //if (initMap[x][y].type === '█') {
+          //  this.soursesService.addSourses({ x, y }, true);
+          //}
         }
       }
     }

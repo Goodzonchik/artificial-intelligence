@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Rover } from './rover';
+import { Position, Rover } from './rover';
 import { SoursesService } from './sourses.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoversService {
+  base: Position = { x: 70, y: 35 };
+
   rovers: Rover[] = [
     {
       id: 0,
@@ -25,7 +27,7 @@ export class RoversService {
 
   constructor(private soursesService: SoursesService) {}
 
-  updateRovers() {
+  roverAction() {
     for (const rover of this.rovers) {
       if (rover.action === 'move') {
         if (
@@ -56,15 +58,18 @@ export class RoversService {
         // }
 
         // TODO надо удалить первый источник
+
+        return;
       }
       if (rover.action === 'upload') {
         rover.payload = rover.payload - 1;
         this.soursesService.addSilver();
 
-        if (rover.payload === 1) {
+        if (rover.payload === 0) {
           rover.action = 'move';
-          rover.endPosition =
-            this.soursesService.sourses$.getValue().sourses[0].position;
+          rover.endPosition = {
+            ...this.soursesService.sourses$.getValue().sourses[0].position,
+          };
         }
       }
       /*if (rover.action === 'search') {
@@ -72,35 +77,31 @@ export class RoversService {
         rover.endPosition.x === mapSize.x;
         rover.endPosition.x === mapSize.y;
       }*/
-      console.log(rover.action);
     }
   }
 
   miningAlgo() {
     for (const rover of this.rovers) {
       if (rover.action === 'wait') {
-        rover.endPosition = {
-          ...this.soursesService.sourses$.getValue().sourses[0].position,
-        };
+        this.setRoverEndPosition(
+          rover,
+          this.soursesService.sourses$.getValue().sourses[0].position
+        );
         rover.action = 'move';
 
         return;
       }
       if (rover.action === 'move') {
         if (
-          rover.position.x === rover.endPosition.x &&
-          rover.position.y === rover.endPosition.y &&
-          rover.endPosition.x !== 0 &&
-          rover.endPosition.y !== 0
+          this.checkPosition(rover.position, rover.endPosition) &&
+          !this.checkPosition(rover.position, this.base)
         ) {
           rover.action = 'mining';
           return;
         }
         if (
-          rover.position.x === rover.endPosition.x &&
-          rover.position.y === rover.endPosition.y &&
-          rover.endPosition.x === 0 &&
-          rover.endPosition.y === 0 &&
+          this.checkPosition(rover.position, rover.endPosition) &&
+          this.checkPosition(rover.position, this.base) &&
           rover.payload > 0
         ) {
           rover.action = 'upload';
@@ -110,9 +111,8 @@ export class RoversService {
       }
       if (rover.action === 'mining') {
         if (rover.payload === 10) {
+          this.setRoverEndPosition(rover, this.base);
           rover.action = 'move';
-          rover.endPosition.x = 0;
-          rover.endPosition.y = 0;
           return;
         }
       }
@@ -125,5 +125,18 @@ export class RoversService {
         return;
       }*/
     }
+  }
+
+  private checkPosition(
+    startPosition: Position,
+    endPosition: Position
+  ): boolean {
+    return (
+      startPosition.x === endPosition.x && startPosition.y === endPosition.y
+    );
+  }
+
+  private setRoverEndPosition(rover: Rover, position: Position) {
+    rover.endPosition = { ...position };
   }
 }

@@ -24,7 +24,7 @@ export class SoursesService {
           position,
         },
       ],
-      knownSourses: [...this.sourses$.getValue().knownSourses],
+      //  knownSourses: [...this.sourses$.getValue().knownSourses],
     };
 
     this.sourses$.next(newSourses);
