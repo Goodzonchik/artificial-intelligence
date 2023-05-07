@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Position, Rover } from './rover';
 import { SoursesService } from './sourses.service';
+import { lengthTwoNumer } from './shared/length-two-number';
 
 @Injectable({
   providedIn: 'root',
@@ -30,26 +31,17 @@ export class RoversService {
   roverAction() {
     for (const rover of this.rovers) {
       if (rover.action === 'move') {
-        if (
-          Math.abs(Math.abs(rover.position.x) - Math.abs(rover.endPosition.x)) >
-          Math.abs(Math.abs(rover.position.y) - Math.abs(rover.endPosition.y))
-        ) {
-          if (rover.position.x > rover.endPosition.x) {
-            rover.position.x = rover.position.x - 1;
-          } else if (rover.position.x < rover.endPosition.x) {
-            rover.position.x = rover.position.x + 1;
-          }
-        } else {
-          if (rover.position.y > rover.endPosition.y) {
-            rover.position.y = rover.position.y - 1;
-          } else if (rover.position.y < rover.endPosition.y) {
-            rover.position.y = rover.position.y + 1;
-          }
-        }
+        const axis =
+          lengthTwoNumer(rover.position.x, rover.endPosition.x) >
+          lengthTwoNumer(rover.position.y, rover.endPosition.y)
+            ? 'x'
+            : 'y';
+
+        this.moveToNextCell(rover, axis);
       }
       if (rover.action === 'mining') {
         rover.payload = rover.payload + 1;
-        //this.soursesService.sourses$.getValue().sourses[0].payload--;
+        this.soursesService.sourses$.getValue().sourses[0].payload--;
 
         // if (this.soursesService.sourses$.getValue().sourses[0].payload <= 0) {
         //   this.soursesService.removeSilver(
@@ -138,5 +130,13 @@ export class RoversService {
 
   private setRoverEndPosition(rover: Rover, position: Position) {
     rover.endPosition = { ...position };
+  }
+
+  private moveToNextCell(rover: Rover, point: 'x' | 'y') {
+    if (rover.position[point] > rover.endPosition[point]) {
+      rover.position[point] = rover.position[point] - 1;
+    } else if (rover.position[point] < rover.endPosition[point]) {
+      rover.position[point] = rover.position[point] + 1;
+    }
   }
 }
